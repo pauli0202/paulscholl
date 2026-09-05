@@ -1,0 +1,52 @@
+---
+const items = [
+	{
+		date: "seit 01/2025",
+		title: "WordPress Developer",
+		place: "Pocket-Rocket GmbH",
+		points: [
+			"Eigenverantwortliche Kundenprojekte",
+			"Eigene WordPress-Plugins & PHP-Module",
+			"Frontend mit Astro, TypeScript, Tailwind, Oxygen, Divi, Elementor",
+			"WooCommerce-Shops (B2B/B2C)",
+			"MS365-Administration",
+			"DSGVO-Umsetzung",
+			"Fachliche Führung eines Zweierteams",
+			"Einsatz von KI-Tools zur Prozessbeschleunigung",
+		],
+	},
+	{
+		date: "2021–2025",
+		title: "Fachinformatiker für Anwendungsentwicklung",
+		place: "TGBBZ Dillingen",
+		points: [],
+	},
+];
+---
+
+<section id="erfahrung" class="mx-auto max-w-3xl px-6 py-20">
+	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Erfahrung</h2>
+	<div class="relative mt-10 space-y-10 border-l border-slate-200 pl-8 dark:border-slate-800">
+		{
+			items.map((item) => (
+				<div class="relative">
+					<span class="absolute -left-[2.15rem] top-1 h-3 w-3 rounded-full bg-indigo-600 ring-4 ring-white dark:ring-slate-950" />
+					<p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+						{item.date}
+					</p>
+					<h3 class="mt-1 font-semibold text-slate-900 dark:text-slate-100">
+						{item.title}
+					</h3>
+					<p class="text-sm text-slate-600 dark:text-slate-400">
+						{item.place}
+					</p>
+					{item.points.length > 0 && (
+						<ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-400">
+							{item.points.map((point) => <li>{point}</li>)}
+						</ul>
+					)}
+				</div>
+			))
+		}
+	</div>
+</section>

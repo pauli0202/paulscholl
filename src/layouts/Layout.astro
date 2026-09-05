@@ -1,23 +1,33 @@
+---
+import "../styles/global.css";
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="de">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta
+			name="description"
+			content="Paul Scholl – AI Engineer & Webentwickler. KI-gestützte Workflows, Agentic Tools und moderne Websites von Astro bis WordPress."
+		/>
+		<title>Paul Scholl — AI Engineer & Webentwickler</title>
+		<script is:inline>
+			(function () {
+				const stored = localStorage.getItem("theme");
+				const prefersDark = window.matchMedia(
+					"(prefers-color-scheme: dark)",
+				).matches;
+				if (stored === "dark" || (!stored && prefersDark)) {
+					document.documentElement.classList.add("dark");
+				}
+			})();
+		</script>
 	</head>
-	<body>
+	<body class="bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
 		<slot />
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

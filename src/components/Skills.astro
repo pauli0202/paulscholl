@@ -1,0 +1,72 @@
+---
+const categories = [
+	{
+		title: "AI & Agentic Engineering",
+		skills: [
+			"Claude Code",
+			"Agentic Workflows",
+			"LLM-Integration",
+			"Harness Engineering (Push, Pointer Memory)",
+		],
+	},
+	{
+		title: "Frontend",
+		skills: [
+			"Astro",
+			"Tailwind CSS",
+			"HTML",
+			"CSS",
+			"JavaScript",
+			"TypeScript",
+			"Figma",
+			"Performance-Optimierung",
+		],
+	},
+	{
+		title: "WordPress & CMS",
+		skills: [
+			"WordPress",
+			"Custom WP Development",
+			"Elementor",
+			"Oxygen",
+			"Divi",
+			"WooCommerce",
+		],
+	},
+	{
+		title: "Backend",
+		skills: ["PHP", "REST-APIs/Schnittstellen"],
+	},
+	{
+		title: "Infrastruktur & IT-Administration",
+		skills: ["DevOps", "DNS", "IT-Administration (Microsoft 365)", "Git"],
+	},
+];
+---
+
+<section
+	id="skills"
+	class="mx-auto max-w-5xl px-6 py-20"
+>
+	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
+		Skills & Tech-Stack
+	</h2>
+	<div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+		{
+			categories.map((category) => (
+				<div class="rounded-lg border border-slate-200 p-6 dark:border-slate-800">
+					<h3 class="font-semibold text-slate-900 dark:text-slate-100">
+						{category.title}
+					</h3>
+					<div class="mt-4 flex flex-wrap gap-2">
+						{category.skills.map((skill) => (
+							<span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
+								{skill}
+							</span>
+						))}
+					</div>
+				</div>
+			))
+		}
+	</div>
+</section>

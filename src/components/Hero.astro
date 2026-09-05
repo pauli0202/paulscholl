@@ -1,0 +1,41 @@
+---
+import { Image } from "astro:assets";
+import profile from "../assets/profile.jpg";
+---
+
+<section
+	id="hero"
+	class="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center"
+>
+	<Image
+		src={profile}
+		alt="Portrait von Paul Scholl"
+		width={128}
+		height={128}
+		class="h-32 w-32 rounded-full object-cover ring-4 ring-indigo-500/20"
+	/>
+	<div class="space-y-3">
+		<h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Paul Scholl</h1>
+		<p class="text-lg font-medium text-indigo-600 dark:text-indigo-400">
+			AI Engineer & Webentwickler
+		</p>
+		<p class="mx-auto max-w-xl text-slate-600 dark:text-slate-400">
+			Ich baue KI-gestützte Workflows und moderne Websites – von Agentic
+			Tools bis WordPress.
+		</p>
+	</div>
+	<div class="flex flex-wrap items-center justify-center gap-4">
+		<a
+			href="#kontakt"
+			class="rounded-md bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+		>
+			Kontakt aufnehmen
+		</a>
+		<a
+			href="#projekte"
+			class="rounded-md border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-indigo-500 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-indigo-400 dark:hover:text-indigo-400"
+		>
+			Projekte ansehen
+		</a>
+	</div>
+</section>
