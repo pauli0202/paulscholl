@@ -1,10 +1,19 @@
 ---
 const items = [
 	{
-		date: "2021–2025",
+		date: "2022–2025",
 		title: "Ausbildung zum Fachinformatiker für Anwendungsentwicklung",
 		place: "TGBBZ Dillingen",
 		points: [],
+	},
+	{
+		date: "12/2022–01/2025",
+		title: "Auszubildender Fachinformatiker Anwendungsentwicklung",
+		place: "Pocket-Rocket GmbH, St. Wendel",
+		points: [
+			"Mitarbeit an Kundenprojekten von der Umsetzung bis zum Livegang",
+			"Aufbau fachlicher Grundlagen in PHP, JavaScript, Datenbanken und Webtechnologien",
+		],
 	},
 	{
 		date: "seit 01/2025",
@@ -26,13 +35,73 @@ const items = [
 
 <section id="erfahrung" class="mx-auto max-w-5xl px-6 py-20">
 	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Erfahrung</h2>
-	<div class="relative mt-16">
-		<div class="absolute inset-x-0 top-[5px] hidden h-px bg-slate-200 dark:bg-slate-800 sm:block" />
-		<div class="flex flex-col gap-10 sm:flex-row sm:gap-8">
+	<p class="mt-4 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
+		Spring durch meinen Lebenslauf: <kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">←</kbd>
+		<kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">→</kbd>
+		zum Laufen, <kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">Leertaste</kbd>
+		zum Springen – oder die Buttons unten.
+	</p>
+
+	<div class="relative mt-6 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
+		<canvas
+			id="cv-game"
+			tabindex="0"
+			class="block w-full touch-none outline-none"
+			style="height: 280px;"
+		></canvas>
+		<div
+			id="cv-game-hint"
+			class="absolute inset-0 flex cursor-pointer items-center justify-center bg-slate-900/50 text-sm font-medium text-white backdrop-blur-sm"
+		>
+			Klicke zum Starten
+		</div>
+	</div>
+
+	<div class="mt-4 flex items-center justify-between gap-4">
+		<div class="flex gap-2">
+			<button
+				id="cv-btn-left"
+				type="button"
+				aria-label="Nach links laufen"
+				class="h-11 w-11 select-none rounded-md border border-slate-300 text-lg font-semibold text-slate-700 transition-colors hover:border-indigo-500 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-indigo-400 dark:hover:text-indigo-400"
+				>◀</button
+			>
+			<button
+				id="cv-btn-right"
+				type="button"
+				aria-label="Nach rechts laufen"
+				class="h-11 w-11 select-none rounded-md border border-slate-300 text-lg font-semibold text-slate-700 transition-colors hover:border-indigo-500 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-indigo-400 dark:hover:text-indigo-400"
+				>▶</button
+			>
+		</div>
+		<button
+			id="cv-btn-jump"
+			type="button"
+			aria-label="Springen"
+			class="h-11 rounded-md bg-indigo-600 px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+			>Springen</button
+		>
+	</div>
+
+	<div
+		id="cv-game-panel"
+		class="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-5 dark:border-indigo-500/30 dark:bg-indigo-500/10"
+	>
+		<p class="text-sm text-slate-600 dark:text-slate-400">
+			Lauf los, um die erste Station zu erreichen …
+		</p>
+	</div>
+
+	<details class="mt-6 group">
+		<summary
+			class="cursor-pointer text-sm font-medium text-indigo-600 marker:content-none dark:text-indigo-400"
+		>
+			Lebenslauf als Text anzeigen
+		</summary>
+		<div class="mt-6 space-y-8">
 			{
 				items.map((item) => (
-					<div class="relative flex-1 pt-8 sm:pt-10">
-						<span class="absolute left-0 top-0 h-3 w-3 rounded-full bg-indigo-600 ring-4 ring-white dark:ring-slate-950" />
+					<div>
 						<p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
 							{item.date}
 						</p>
@@ -51,5 +120,325 @@ const items = [
 				))
 			}
 		</div>
-	</div>
+	</details>
 </section>
+
+<script define:vars={{ itemsJson: JSON.stringify(items) }}>
+	window.__cvItems = JSON.parse(itemsJson);
+</script>
+
+<script>
+	const canvas = document.getElementById("cv-game") as HTMLCanvasElement | null;
+	const hint = document.getElementById("cv-game-hint");
+	const panel = document.getElementById("cv-game-panel");
+	const btnLeft = document.getElementById("cv-btn-left");
+	const btnRight = document.getElementById("cv-btn-right");
+	const btnJump = document.getElementById("cv-btn-jump");
+
+	if (canvas && hint && panel) {
+		const ctx = canvas.getContext("2d")!;
+		const items = (window as any).__cvItems as {
+			date: string;
+			title: string;
+			place: string;
+			points: string[];
+		}[];
+
+		const HEIGHT = 280;
+		const GROUND_Y = 200;
+		const PLAYER_W = 26;
+		const PLAYER_H = 34;
+		const GRAVITY = 0.6;
+		const JUMP_VELOCITY = -12;
+		const MOVE_SPEED = 3.2;
+
+		const segments = [
+			{ x: 0, w: 380 },
+			{ x: 480, w: 350 },
+			{ x: 930, w: 350 },
+			{ x: 1380, w: 650 },
+		];
+		const levelWidth = segments[segments.length - 1].x + segments[segments.length - 1].w + 60;
+		const checkpointXs = [560, 1010, 1460];
+
+		const checkpoints = items.map((item, i) => ({
+			x: checkpointXs[i],
+			visited: false,
+			item,
+		}));
+		const finish = { x: 1950, reached: false };
+
+		const player = { x: 40, y: GROUND_Y - PLAYER_H, vx: 0, vy: 0, grounded: true, facing: 1 };
+		let lastCheckpointX = 40;
+
+		const keys = { left: false, right: false, jumpPressed: false };
+		let started = false;
+		let running = true;
+
+		function isDark() {
+			return document.documentElement.classList.contains("dark");
+		}
+
+		function resizeCanvas() {
+			if (!canvas) return;
+			const rect = canvas.getBoundingClientRect();
+			const dpr = window.devicePixelRatio || 1;
+			canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+			canvas.height = Math.floor(HEIGHT * dpr);
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			viewWidth = rect.width;
+		}
+
+		let viewWidth = 0;
+		resizeCanvas();
+		window.addEventListener("resize", resizeCanvas);
+
+		function groundAt(x: number) {
+			return segments.find((s) => x >= s.x && x <= s.x + s.w);
+		}
+
+		function respawn() {
+			player.x = lastCheckpointX;
+			player.y = GROUND_Y - PLAYER_H;
+			player.vx = 0;
+			player.vy = 0;
+			player.grounded = true;
+		}
+
+		function renderPanel(html: string) {
+			if (panel) panel.innerHTML = html;
+		}
+
+		function checkpointHtml(cp: (typeof checkpoints)[number]) {
+			const pointsHtml =
+				cp.item.points.length > 0
+					? `<ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-400">${cp.item.points
+							.map((p) => `<li>${p}</li>`)
+							.join("")}</ul>`
+					: "";
+			return `
+				<p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">${cp.item.date}</p>
+				<h3 class="mt-1 font-semibold text-slate-900 dark:text-slate-100">${cp.item.title}</h3>
+				<p class="text-sm text-slate-600 dark:text-slate-400">${cp.item.place}</p>
+				${pointsHtml}
+			`;
+		}
+
+		function finishHtml() {
+			return `
+				<p class="font-semibold text-slate-900 dark:text-slate-100">Geschafft! 🏁</p>
+				<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Lust, mehr zu erfahren?</p>
+				<a href="#kontakt" class="mt-3 inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500">Kontakt aufnehmen</a>
+			`;
+		}
+
+		function update() {
+			player.vx = 0;
+			if (keys.left) {
+				player.vx = -MOVE_SPEED;
+				player.facing = -1;
+			}
+			if (keys.right) {
+				player.vx = MOVE_SPEED;
+				player.facing = 1;
+			}
+			player.x += player.vx;
+			player.x = Math.max(0, Math.min(levelWidth - PLAYER_W, player.x));
+
+			if (keys.jumpPressed && player.grounded) {
+				player.vy = JUMP_VELOCITY;
+				player.grounded = false;
+			}
+			keys.jumpPressed = false;
+
+			player.vy += GRAVITY;
+			player.y += player.vy;
+
+			const seg = groundAt(player.x + PLAYER_W / 2);
+			if (seg && player.vy >= 0 && player.y + PLAYER_H >= GROUND_Y) {
+				player.y = GROUND_Y - PLAYER_H;
+				player.vy = 0;
+				player.grounded = true;
+			} else {
+				player.grounded = false;
+			}
+
+			if (player.y > HEIGHT + 150) {
+				respawn();
+			}
+
+			for (const cp of checkpoints) {
+				if (!cp.visited && Math.abs(player.x + PLAYER_W / 2 - cp.x) < 30) {
+					cp.visited = true;
+					lastCheckpointX = Math.max(0, cp.x - 40);
+					renderPanel(checkpointHtml(cp));
+				}
+			}
+			if (!finish.reached && Math.abs(player.x + PLAYER_W / 2 - finish.x) < 30) {
+				finish.reached = true;
+				renderPanel(finishHtml());
+			}
+		}
+
+		function draw() {
+			const dark = isDark();
+			ctx.clearRect(0, 0, viewWidth, HEIGHT);
+
+			const skyTop = dark ? "#0f172a" : "#eef2ff";
+			const skyBottom = dark ? "#020617" : "#ffffff";
+			const grad = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+			grad.addColorStop(0, skyTop);
+			grad.addColorStop(1, skyBottom);
+			ctx.fillStyle = grad;
+			ctx.fillRect(0, 0, viewWidth, HEIGHT);
+
+			const camX = Math.max(
+				0,
+				Math.min(player.x - viewWidth / 2, levelWidth - viewWidth),
+			);
+
+			ctx.fillStyle = dark ? "#1e293b" : "#e2e8f0";
+			for (const s of segments) {
+				ctx.fillRect(s.x - camX, GROUND_Y, s.w, HEIGHT - GROUND_Y);
+				ctx.fillStyle = "#4f46e5";
+				ctx.fillRect(s.x - camX, GROUND_Y, s.w, 3);
+				ctx.fillStyle = dark ? "#1e293b" : "#e2e8f0";
+			}
+
+			for (const cp of checkpoints) {
+				const px = cp.x - camX;
+				ctx.strokeStyle = dark ? "#475569" : "#94a3b8";
+				ctx.lineWidth = 3;
+				ctx.beginPath();
+				ctx.moveTo(px, GROUND_Y);
+				ctx.lineTo(px, GROUND_Y - 70);
+				ctx.stroke();
+				ctx.fillStyle = cp.visited ? "#10b981" : "#4f46e5";
+				ctx.beginPath();
+				ctx.moveTo(px, GROUND_Y - 70);
+				ctx.lineTo(px + 26, GROUND_Y - 58);
+				ctx.lineTo(px, GROUND_Y - 46);
+				ctx.closePath();
+				ctx.fill();
+				ctx.fillStyle = dark ? "#cbd5e1" : "#334155";
+				ctx.font = "11px sans-serif";
+				ctx.textAlign = "center";
+				ctx.fillText(cp.item.date, px, GROUND_Y - 80);
+			}
+
+			const fx = finish.x - camX;
+			ctx.strokeStyle = dark ? "#475569" : "#94a3b8";
+			ctx.lineWidth = 3;
+			ctx.beginPath();
+			ctx.moveTo(fx, GROUND_Y);
+			ctx.lineTo(fx, GROUND_Y - 90);
+			ctx.stroke();
+			ctx.fillStyle = finish.reached ? "#10b981" : "#fbbf24";
+			ctx.fillRect(fx, GROUND_Y - 90, 28, 20);
+			ctx.fillStyle = dark ? "#cbd5e1" : "#334155";
+			ctx.font = "11px sans-serif";
+			ctx.textAlign = "center";
+			ctx.fillText("Kontakt", fx + 14, GROUND_Y - 98);
+
+			const px = player.x - camX;
+			ctx.fillStyle = "#4f46e5";
+			ctx.beginPath();
+			ctx.roundRect(px, player.y, PLAYER_W, PLAYER_H, 6);
+			ctx.fill();
+			ctx.fillStyle = "#ffffff";
+			const eyeX = player.facing === 1 ? px + PLAYER_W - 9 : px + 5;
+			ctx.beginPath();
+			ctx.arc(eyeX, player.y + 10, 3.5, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.fillStyle = "#1e1b4b";
+			ctx.beginPath();
+			ctx.arc(eyeX + (player.facing === 1 ? 1 : -1), player.y + 10, 1.6, 0, Math.PI * 2);
+			ctx.fill();
+
+			const visitedCount = checkpoints.filter((c) => c.visited).length;
+			ctx.textAlign = "left";
+			ctx.font = "12px sans-serif";
+			ctx.fillStyle = dark ? "#cbd5e1" : "#334155";
+			ctx.fillText(`Stationen: ${visitedCount}/${checkpoints.length}`, 12, 20);
+		}
+
+		let rafId: number | null = null;
+		function loop() {
+			if (!running) {
+				rafId = null;
+				return;
+			}
+			update();
+			draw();
+			rafId = requestAnimationFrame(loop);
+		}
+
+		function startGame() {
+			if (started) return;
+			started = true;
+			hint.style.display = "none";
+			canvas.focus();
+			loop();
+		}
+
+		hint.addEventListener("click", startGame);
+		canvas.addEventListener("click", startGame);
+		canvas.addEventListener("focus", startGame);
+
+		canvas.addEventListener("keydown", (e) => {
+			if (["ArrowLeft", "ArrowRight", "ArrowUp", " ", "a", "d", "w"].includes(e.key)) {
+				e.preventDefault();
+			}
+			if (e.key === "ArrowLeft" || e.key === "a") keys.left = true;
+			if (e.key === "ArrowRight" || e.key === "d") keys.right = true;
+			if (e.key === "ArrowUp" || e.key === " " || e.key === "w") keys.jumpPressed = true;
+		});
+		canvas.addEventListener("keyup", (e) => {
+			if (e.key === "ArrowLeft" || e.key === "a") keys.left = false;
+			if (e.key === "ArrowRight" || e.key === "d") keys.right = false;
+		});
+
+		function bindHold(el: HTMLElement | null, onDown: () => void, onUp: () => void) {
+			if (!el) return;
+			el.addEventListener("pointerdown", (e) => {
+				e.preventDefault();
+				startGame();
+				onDown();
+			});
+			el.addEventListener("pointerup", onUp);
+			el.addEventListener("pointerleave", onUp);
+			el.addEventListener("pointercancel", onUp);
+		}
+		bindHold(
+			btnLeft,
+			() => (keys.left = true),
+			() => (keys.left = false),
+		);
+		bindHold(
+			btnRight,
+			() => (keys.right = true),
+			() => (keys.right = false),
+		);
+		bindHold(
+			btnJump,
+			() => (keys.jumpPressed = true),
+			() => {},
+		);
+
+		const io = new IntersectionObserver(
+			([entry]) => {
+				running = entry.isIntersecting;
+				if (running && started && rafId === null) loop();
+			},
+			{ threshold: 0.1 },
+		);
+		io.observe(canvas);
+
+		document.addEventListener("visibilitychange", () => {
+			running = !document.hidden;
+			if (running && started && rafId === null) loop();
+		});
+
+		draw();
+	}
+</script>
