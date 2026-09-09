@@ -36,10 +36,12 @@ const items = [
 <section id="erfahrung" class="mx-auto max-w-5xl px-6 py-20">
 	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Erfahrung</h2>
 	<p class="mt-4 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
-		Spring durch meinen Lebenslauf: <kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">←</kbd>
-		<kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">→</kbd>
-		zum Laufen, <kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">Leertaste</kbd>
-		zum Springen – oder die Buttons unten.
+		Spring durch meinen Lebenslauf: <kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">←</kbd>{" "}
+		<kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">→</kbd>{" "}
+		zum Laufen, <kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">Leertaste</kbd>{" "}
+		zum Springen – oder die Buttons unten. Spring die{" "}
+		<span class="font-medium text-amber-600 dark:text-amber-400">?-Blöcke</span>{" "}
+		von unten an, um Details freizuschalten.
 	</p>
 
 	<div class="relative mt-6 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
@@ -155,21 +157,79 @@ const items = [
 		const segments = [
 			{ x: 0, w: 380 },
 			{ x: 480, w: 350 },
-			{ x: 930, w: 350 },
-			{ x: 1380, w: 650 },
+			{ x: 930, w: 400 },
+			{ x: 1430, w: 1250 },
 		];
 		const levelWidth = segments[segments.length - 1].x + segments[segments.length - 1].w + 60;
-		const checkpointXs = [560, 1010, 1460];
+		const checkpointXs = [560, 1010, 1510];
 
 		const checkpoints = items.map((item, i) => ({
 			x: checkpointXs[i],
 			visited: false,
+			collected: new Set<number>(),
 			item,
 		}));
-		const finish = { x: 1950, reached: false };
+		const finish = { x: 2610, reached: false };
+
+		const BLOCK_SIZE = 26;
+		const STEP_W = 50;
+		const STEP_THICKNESS = 14;
+		const STEP_Y = GROUND_Y - 50;
+		const STEP_SPACING = 130;
+		const BLOCK_GAP_ABOVE_STEP = 55;
+
+		const steps: { x: number; y: number; w: number }[] = [];
+		const blocks: {
+			cpIndex: number;
+			pointIndex: number;
+			x: number;
+			y: number;
+			w: number;
+			h: number;
+			hit: boolean;
+			bounce: number;
+		}[] = [];
+		checkpoints.forEach((cp, cpIndex) => {
+			const n = cp.item.points.length;
+			for (let p = 0; p < n; p++) {
+				const stepX = cp.x + 60 + p * STEP_SPACING;
+				steps.push({ x: stepX, y: STEP_Y, w: STEP_W });
+				blocks.push({
+					cpIndex,
+					pointIndex: p,
+					x: stepX + (STEP_W - BLOCK_SIZE) / 2,
+					y: STEP_Y - BLOCK_GAP_ABOVE_STEP - BLOCK_SIZE,
+					w: BLOCK_SIZE,
+					h: BLOCK_SIZE,
+					hit: false,
+					bounce: 0,
+				});
+			}
+		});
+		const totalPoints = items.reduce((sum, it) => sum + it.points.length, 0);
+		let totalCollected = 0;
+
+		const surfaces: { x: number; w: number; y: number }[] = [
+			...segments.map((s) => ({ x: s.x, w: s.w, y: GROUND_Y })),
+			...steps.map((s) => ({ x: s.x, w: s.w, y: s.y })),
+		];
+
+		let particles: { x: number; y: number; life: number; text: string }[] = [];
+
+		const hillSpacing = 420;
+		const hills = Array.from({ length: Math.ceil(levelWidth / hillSpacing) + 2 }, (_, i) => ({
+			x: i * hillSpacing + 80,
+			r: 70 + (i % 3) * 20,
+		}));
+		const cloudSpacing = 300;
+		const clouds = Array.from({ length: Math.ceil(levelWidth / cloudSpacing) + 2 }, (_, i) => ({
+			x: i * cloudSpacing + 40,
+			y: 30 + (i % 3) * 20,
+		}));
 
 		const player = { x: 40, y: GROUND_Y - PLAYER_H, vx: 0, vy: 0, grounded: true, facing: 1 };
 		let lastCheckpointX = 40;
+		let walkT = 0;
 
 		const keys = { left: false, right: false, jumpPressed: false };
 		let started = false;
@@ -193,10 +253,6 @@ const items = [
 		resizeCanvas();
 		window.addEventListener("resize", resizeCanvas);
 
-		function groundAt(x: number) {
-			return segments.find((s) => x >= s.x && x <= s.x + s.w);
-		}
-
 		function respawn() {
 			player.x = lastCheckpointX;
 			player.y = GROUND_Y - PLAYER_H;
@@ -209,30 +265,50 @@ const items = [
 			if (panel) panel.innerHTML = html;
 		}
 
-		function checkpointHtml(cp: (typeof checkpoints)[number]) {
+		function renderCheckpointPanel(cp: (typeof checkpoints)[number]) {
+			const total = cp.item.points.length;
+			const collectedCount = cp.collected.size;
 			const pointsHtml =
-				cp.item.points.length > 0
-					? `<ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-400">${cp.item.points
-							.map((p) => `<li>${p}</li>`)
-							.join("")}</ul>`
+				total > 0
+					? `<ul class="mt-3 space-y-1 pl-5 text-sm">${cp.item.points
+							.map((p, idx) =>
+								cp.collected.has(idx)
+									? `<li class="list-disc text-slate-600 dark:text-slate-400">${p}</li>`
+									: `<li class="list-none text-slate-400 dark:text-slate-600">░░░░░░░░░░░░░░░░░░</li>`,
+							)
+							.join("")}</ul>${
+							collectedCount < total
+								? `<p class="mt-2 text-xs text-slate-500 dark:text-slate-500">🧱 Noch ${total - collectedCount} Block${total - collectedCount === 1 ? "" : "s"} über dir – von unten anspringen!</p>`
+								: `<p class="mt-2 text-xs text-emerald-600 dark:text-emerald-400">✓ Alle Punkte entdeckt!</p>`
+						}`
 					: "";
-			return `
+			renderPanel(`
 				<p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">${cp.item.date}</p>
 				<h3 class="mt-1 font-semibold text-slate-900 dark:text-slate-100">${cp.item.title}</h3>
 				<p class="text-sm text-slate-600 dark:text-slate-400">${cp.item.place}</p>
 				${pointsHtml}
-			`;
+			`);
+		}
+
+		function collectPoint(cpIndex: number, pointIndex: number) {
+			const cp = checkpoints[cpIndex];
+			if (cp.collected.has(pointIndex)) return;
+			cp.collected.add(pointIndex);
+			totalCollected++;
+			renderCheckpointPanel(cp);
 		}
 
 		function finishHtml() {
 			return `
 				<p class="font-semibold text-slate-900 dark:text-slate-100">Geschafft! 🏁</p>
-				<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Lust, mehr zu erfahren?</p>
+				<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Du hast ${totalCollected} von ${totalPoints} Lebenslauf-Punkten entdeckt. Lust, mehr zu erfahren?</p>
 				<a href="#kontakt" class="mt-3 inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500">Kontakt aufnehmen</a>
 			`;
 		}
 
 		function update() {
+			const prevTop = player.y;
+
 			player.vx = 0;
 			if (keys.left) {
 				player.vx = -MOVE_SPEED;
@@ -245,6 +321,12 @@ const items = [
 			player.x += player.vx;
 			player.x = Math.max(0, Math.min(levelWidth - PLAYER_W, player.x));
 
+			if (player.grounded && player.vx !== 0) {
+				walkT += 0.3;
+			} else {
+				walkT = 0;
+			}
+
 			if (keys.jumpPressed && player.grounded) {
 				player.vy = JUMP_VELOCITY;
 				player.grounded = false;
@@ -254,14 +336,44 @@ const items = [
 			player.vy += GRAVITY;
 			player.y += player.vy;
 
-			const seg = groundAt(player.x + PLAYER_W / 2);
-			if (seg && player.vy >= 0 && player.y + PLAYER_H >= GROUND_Y) {
-				player.y = GROUND_Y - PLAYER_H;
+			let landY: number | null = null;
+			if (player.vy >= 0) {
+				const prevBottom = prevTop + PLAYER_H;
+				const newBottom = player.y + PLAYER_H;
+				for (const s of surfaces) {
+					const overlapX = player.x + PLAYER_W > s.x && player.x < s.x + s.w;
+					if (!overlapX) continue;
+					if (prevBottom <= s.y + 1 && newBottom >= s.y) {
+						if (landY === null || s.y < landY) landY = s.y;
+					}
+				}
+			}
+			if (landY !== null) {
+				player.y = landY - PLAYER_H;
 				player.vy = 0;
 				player.grounded = true;
 			} else {
 				player.grounded = false;
 			}
+
+			for (const b of blocks) {
+				if (b.hit) continue;
+				const overlapX = player.x + PLAYER_W > b.x && player.x < b.x + b.w;
+				const blockBottom = b.y + b.h;
+				if (overlapX && player.vy < 0 && prevTop >= blockBottom && player.y < blockBottom) {
+					b.hit = true;
+					b.bounce = 1;
+					player.vy = 2;
+					player.y = blockBottom;
+					collectPoint(b.cpIndex, b.pointIndex);
+					particles.push({ x: b.x + b.w / 2, y: b.y, life: 1, text: "+1" });
+				}
+			}
+			for (const b of blocks) {
+				if (b.bounce > 0) b.bounce = Math.max(0, b.bounce - 0.15);
+			}
+			for (const p of particles) p.life -= 0.02;
+			particles = particles.filter((p) => p.life > 0);
 
 			if (player.y > HEIGHT + 150) {
 				respawn();
@@ -271,7 +383,7 @@ const items = [
 				if (!cp.visited && Math.abs(player.x + PLAYER_W / 2 - cp.x) < 30) {
 					cp.visited = true;
 					lastCheckpointX = Math.max(0, cp.x - 40);
-					renderPanel(checkpointHtml(cp));
+					renderCheckpointPanel(cp);
 				}
 			}
 			if (!finish.reached && Math.abs(player.x + PLAYER_W / 2 - finish.x) < 30) {
@@ -297,12 +409,63 @@ const items = [
 				Math.min(player.x - viewWidth / 2, levelWidth - viewWidth),
 			);
 
+			ctx.fillStyle = dark ? "rgba(148,163,184,0.15)" : "rgba(255,255,255,0.8)";
+			for (const c of clouds) {
+				const cx = c.x - camX * 0.15;
+				if (cx < -40 || cx > viewWidth + 40) continue;
+				ctx.beginPath();
+				ctx.arc(cx, c.y, 12, 0, Math.PI * 2);
+				ctx.arc(cx + 14, c.y - 4, 14, 0, Math.PI * 2);
+				ctx.arc(cx + 28, c.y, 12, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			ctx.fillStyle = dark ? "#111827" : "#e0e7ff";
+			for (const h of hills) {
+				const hx = h.x - camX * 0.4;
+				if (hx < -h.r || hx > viewWidth + h.r) continue;
+				ctx.beginPath();
+				ctx.ellipse(hx, GROUND_Y, h.r, h.r * 0.6, 0, Math.PI, 2 * Math.PI);
+				ctx.lineTo(hx + h.r, GROUND_Y);
+				ctx.lineTo(hx - h.r, GROUND_Y);
+				ctx.closePath();
+				ctx.fill();
+			}
+
 			ctx.fillStyle = dark ? "#1e293b" : "#e2e8f0";
 			for (const s of segments) {
 				ctx.fillRect(s.x - camX, GROUND_Y, s.w, HEIGHT - GROUND_Y);
 				ctx.fillStyle = "#4f46e5";
 				ctx.fillRect(s.x - camX, GROUND_Y, s.w, 3);
 				ctx.fillStyle = dark ? "#1e293b" : "#e2e8f0";
+			}
+
+			for (const st of steps) {
+				const stx = st.x - camX;
+				if (stx < -60 || stx > viewWidth + 60) continue;
+				ctx.fillStyle = dark ? "#334155" : "#cbd5e1";
+				ctx.fillRect(stx, st.y, st.w, STEP_THICKNESS);
+				ctx.fillStyle = "#818cf8";
+				ctx.fillRect(stx, st.y, st.w, 3);
+			}
+
+			for (const b of blocks) {
+				const bx = b.x - camX;
+				if (bx < -40 || bx > viewWidth + 40) continue;
+				const by = b.y - (b.bounce > 0 ? Math.sin(b.bounce * Math.PI) * 8 : 0);
+				ctx.fillStyle = b.hit ? (dark ? "#57534e" : "#a8a29e") : "#f59e0b";
+				ctx.beginPath();
+				ctx.roundRect(bx, by, b.w, b.h, 4);
+				ctx.fill();
+				ctx.strokeStyle = dark ? "#292524" : "#78716c";
+				ctx.lineWidth = 2;
+				ctx.stroke();
+				if (!b.hit) {
+					ctx.fillStyle = "#78350f";
+					ctx.font = "bold 14px sans-serif";
+					ctx.textAlign = "center";
+					ctx.fillText("?", bx + b.w / 2, by + b.h / 2 + 5);
+				}
 			}
 
 			for (const cp of checkpoints) {
@@ -341,6 +504,11 @@ const items = [
 			ctx.fillText("Kontakt", fx + 14, GROUND_Y - 98);
 
 			const px = player.x - camX;
+			const legSwing = Math.sin(walkT) * 6;
+			ctx.fillStyle = "#3730a3";
+			ctx.fillRect(px + 4, player.y + PLAYER_H - 6, 6, 6 + legSwing);
+			ctx.fillRect(px + PLAYER_W - 10, player.y + PLAYER_H - 6, 6, 6 - legSwing);
+
 			ctx.fillStyle = "#4f46e5";
 			ctx.beginPath();
 			ctx.roundRect(px, player.y, PLAYER_W, PLAYER_H, 6);
@@ -355,11 +523,21 @@ const items = [
 			ctx.arc(eyeX + (player.facing === 1 ? 1 : -1), player.y + 10, 1.6, 0, Math.PI * 2);
 			ctx.fill();
 
+			for (const p of particles) {
+				ctx.globalAlpha = Math.max(0, p.life);
+				ctx.fillStyle = "#f59e0b";
+				ctx.font = "bold 12px sans-serif";
+				ctx.textAlign = "center";
+				ctx.fillText(p.text, p.x - camX, p.y - (1 - p.life) * 24);
+				ctx.globalAlpha = 1;
+			}
+
 			const visitedCount = checkpoints.filter((c) => c.visited).length;
 			ctx.textAlign = "left";
 			ctx.font = "12px sans-serif";
 			ctx.fillStyle = dark ? "#cbd5e1" : "#334155";
 			ctx.fillText(`Stationen: ${visitedCount}/${checkpoints.length}`, 12, 20);
+			ctx.fillText(`Punkte: ${totalCollected}/${totalPoints}`, 12, 36);
 		}
 
 		let rafId: number | null = null;
