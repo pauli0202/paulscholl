@@ -1,7 +1,58 @@
 ---
 const categories = [
 	{
-		title: "AI & Agentic Engineering",
+		title: "Backend & Datenbanken",
+		skills: [
+			"PHP",
+			"MySQL",
+			"REST-APIs & Schnittstellen",
+			"Daten-Import & -Export",
+			"Custom WordPress-Plugins",
+			"Produktfilter & Suchindizes",
+			"Preis- & Exportmodule",
+			"Druckfunktionen",
+		],
+	},
+	{
+		title: "E-Commerce",
+		skills: [
+			"WooCommerce (B2B/B2C)",
+			"Staffelpreise",
+			"Reverse-Charge",
+			"Produktdaten & Bestellprozesse",
+			"Shop-Konfiguratoren",
+			"Mehrsprachige Shops",
+		],
+	},
+	{
+		title: "Frontend",
+		skills: [
+			"Astro",
+			"Tailwind CSS",
+			"TypeScript",
+			"JavaScript",
+			"HTML",
+			"CSS",
+			"Figma-Umsetzung",
+			"Responsive Interfaces",
+			"Performance-Optimierung",
+		],
+	},
+	{
+		title: "WordPress & CMS",
+		skills: [
+			"WordPress",
+			"Custom Plugin-Entwicklung",
+			"Oxygen",
+			"Divi",
+			"Elementor",
+			"ACF",
+			"Polylang",
+			"DSGVO & Consent-Management",
+		],
+	},
+	{
+		title: "KI & Agentic Engineering",
 		skills: [
 			"Claude Code",
 			"Agentic Workflows",
@@ -10,51 +61,26 @@ const categories = [
 		],
 	},
 	{
-		title: "Frontend",
-		skills: [
-			"Astro",
-			"Tailwind CSS",
-			"HTML",
-			"CSS",
-			"JavaScript",
-			"TypeScript",
-			"Figma",
-			"Performance-Optimierung",
-		],
-	},
-	{
-		title: "WordPress & CMS",
-		skills: [
-			"WordPress",
-			"Custom WP Development",
-			"Elementor",
-			"Oxygen",
-			"Divi",
-			"WooCommerce",
-		],
-	},
-	{
-		title: "Backend",
-		skills: ["PHP", "REST-APIs/Schnittstellen"],
-	},
-	{
 		title: "Infrastruktur & IT-Administration",
-		skills: ["DevOps", "DNS", "IT-Administration (Microsoft 365)", "Git"],
+		skills: [
+			"Microsoft 365 Administration",
+			"E-Mail-Sicherheit (SPF, DKIM, DMARC)",
+			"DNS",
+			"Git",
+			"DevOps",
+		],
 	},
 ];
 ---
 
-<section
-	id="skills"
-	class="mx-auto max-w-5xl px-6 py-20"
->
+<section id="skills" class="mx-auto max-w-5xl px-6 py-16 md:py-24">
 	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
 		Skills & Tech-Stack
 	</h2>
 	<div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 		{
 			categories.map((category) => (
-				<div class="rounded-lg border border-slate-200 p-6 dark:border-slate-800">
+				<div class="flex flex-col rounded-lg border border-slate-200 p-6 dark:border-slate-800">
 					<h3 class="font-semibold text-slate-900 dark:text-slate-100">
 						{category.title}
 					</h3>

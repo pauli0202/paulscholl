@@ -5,3 +5,25 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Offset anchor scrolling so the sticky header never covers a section's heading.
+   Mobile header is two rows (nav + scroll strip) and taller than the desktop one. */
+#hero,
+#ueber-mich,
+#skills,
+#projekte,
+#erfahrung,
+#kontakt {
+  scroll-margin-top: 7rem;
+}
+
+@media (min-width: 768px) {
+  #hero,
+  #ueber-mich,
+  #skills,
+  #projekte,
+  #erfahrung,
+  #kontakt {
+    scroll-margin-top: 5rem;
+  }
+}

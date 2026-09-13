@@ -1,0 +1,110 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+
+const links = [
+	{ href: "#ueber-mich", label: "Über mich" },
+	{ href: "#skills", label: "Skills" },
+	{ href: "#projekte", label: "Projekte" },
+	{ href: "#erfahrung", label: "Lebenslauf" },
+	{ href: "#kontakt", label: "Kontakt" },
+];
+---
+
+<header
+	id="site-header"
+	class="sticky top-0 z-50 border-b border-transparent bg-white/80 backdrop-blur-md transition-colors dark:bg-slate-950/80"
+>
+	<div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3">
+		<a
+			href="#hero"
+			class="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100"
+		>
+			Paul Scholl
+		</a>
+		<nav class="hidden items-center gap-1 md:flex">
+			{
+				links.map((link) => (
+					<a
+						href={link.href}
+						data-nav-link
+						data-target={link.href.slice(1)}
+						class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+					>
+						{link.label}
+					</a>
+				))
+			}
+		</nav>
+		<ThemeToggle />
+	</div>
+	<nav
+		class="flex gap-1 overflow-x-auto px-6 pb-3 whitespace-nowrap [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
+	>
+		{
+			links.map((link) => (
+				<a
+					href={link.href}
+					data-nav-link
+					data-target={link.href.slice(1)}
+					class="shrink-0 rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+				>
+					{link.label}
+				</a>
+			))
+		}
+	</nav>
+</header>
+
+<script is:inline>
+	(function () {
+		const header = document.getElementById("site-header");
+		if (!header) return;
+
+		function onScroll() {
+			if (window.scrollY > 8) {
+				header.classList.add(
+					"border-slate-200/70",
+					"dark:border-slate-800/70",
+				);
+				header.classList.remove("border-transparent");
+			} else {
+				header.classList.add("border-transparent");
+				header.classList.remove(
+					"border-slate-200/70",
+					"dark:border-slate-800/70",
+				);
+			}
+		}
+		onScroll();
+		window.addEventListener("scroll", onScroll, { passive: true });
+
+		const navLinks = Array.from(document.querySelectorAll("[data-nav-link]"));
+		const sections = navLinks
+			.map((link) => document.getElementById(link.dataset.target || ""))
+			.filter(Boolean);
+
+		function setActive(id) {
+			navLinks.forEach((link) => {
+				const isActive = link.dataset.target === id;
+				link.classList.toggle("text-indigo-600", isActive);
+				link.classList.toggle("dark:text-indigo-400", isActive);
+				link.classList.toggle("font-semibold", isActive);
+				link.classList.toggle("text-slate-600", !isActive);
+				link.classList.toggle("dark:text-slate-400", !isActive);
+			});
+		}
+
+		if ("IntersectionObserver" in window && sections.length) {
+			const observer = new IntersectionObserver(
+				(entries) => {
+					const visible = entries
+						.filter((entry) => entry.isIntersecting)
+						.sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+					if (visible) setActive(visible.target.id);
+				},
+				{ rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] },
+			);
+			sections.forEach((section) => observer.observe(section));
+		}
+	})();
+</script>
