@@ -73,24 +73,28 @@ const categories = [
 ];
 ---
 
-<section id="skills" class="mx-auto max-w-5xl px-6 py-16 md:py-24">
-	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
-		Skills & Tech-Stack
-	</h2>
-	<div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+<section id="skills" class="section">
+	<h2 class="section-title">Skills & Tech-Stack</h2>
+	<!-- gap-px over a line-coloured background draws the visible grid lines -->
+	<div
+		class="mt-10 grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-3"
+	>
 		{
 			categories.map((category) => (
-				<div class="flex flex-col rounded-lg border border-slate-200 p-6 dark:border-slate-800">
-					<h3 class="font-semibold text-slate-900 dark:text-slate-100">
-						{category.title}
-					</h3>
-					<div class="mt-4 flex flex-wrap gap-2">
-						{category.skills.map((skill) => (
-							<span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300">
-								{skill}
-							</span>
-						))}
+				<div class="flex flex-col bg-bg p-6">
+					<div class="flex items-baseline justify-between gap-4">
+						<h3 class="font-display text-lg leading-snug font-bold">
+							{category.title}
+						</h3>
+						<span class="label tabular-nums" aria-hidden="true">
+							{String(category.skills.length).padStart(2, "0")}
+						</span>
 					</div>
+					<ul class="mt-4 flex flex-wrap gap-2">
+						{category.skills.map((skill) => (
+							<li class="tag">{skill}</li>
+						))}
+					</ul>
 				</div>
 			))
 		}

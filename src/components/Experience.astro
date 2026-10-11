@@ -33,30 +33,37 @@ const items = [
 ];
 ---
 
-<section id="erfahrung" class="mx-auto max-w-5xl px-6 py-20">
-	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Erfahrung</h2>
-	<p class="mt-4 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
-		Spring durch meinen Lebenslauf: <kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">←</kbd>{" "}
-		<kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">→</kbd>{" "}
-		zum Laufen, <kbd class="rounded border border-slate-300 bg-slate-50 px-1.5 py-0.5 font-sans text-xs dark:border-slate-700 dark:bg-slate-800">Leertaste</kbd>{" "}
+<section id="erfahrung" class="section">
+	<h2 class="section-title">Erfahrung</h2>
+	<p class="mt-8 max-w-2xl text-sm text-muted">
+		Spring durch meinen Lebenslauf: <kbd class="border border-line bg-card px-1.5 py-0.5 font-sans text-xs text-fg">←</kbd>{" "}
+		<kbd class="border border-line bg-card px-1.5 py-0.5 font-sans text-xs text-fg">→</kbd>{" "}
+		zum Laufen, <kbd class="border border-line bg-card px-1.5 py-0.5 font-sans text-xs text-fg">Leertaste</kbd>{" "}
 		zum Springen – oder die Buttons unten. Spring die{" "}
-		<span class="font-medium text-amber-600 dark:text-amber-400">?-Blöcke</span>{" "}
+		<span class="font-medium text-bonus-text">?-Blöcke</span>{" "}
 		von unten an, um Details freizuschalten.
 	</p>
 
-	<div class="relative mt-6 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
+	<div class="relative mt-6 overflow-hidden border-2 border-fg">
 		<canvas
 			id="cv-game"
 			tabindex="0"
-			class="block w-full touch-none outline-none"
+			role="application"
+			aria-label="Lebenslauf als Jump-and-Run-Spiel. Pfeiltasten zum Laufen, Leertaste zum Springen."
+			aria-describedby="cv-game-alt"
+			class="block w-full touch-none focus-visible:-outline-offset-4"
 			style="height: 280px;"
 		></canvas>
-		<div
+		<button
 			id="cv-game-hint"
-			class="absolute inset-0 flex cursor-pointer items-center justify-center bg-slate-900/50 text-sm font-medium text-white backdrop-blur-sm"
+			type="button"
+			class="absolute inset-0 flex w-full cursor-pointer items-center justify-center gap-3 bg-zinc-950/60 text-sm font-semibold tracking-wide text-white uppercase backdrop-blur-sm focus-visible:-outline-offset-4"
 		>
-			Klicke zum Starten
-		</div>
+			<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+				<path d="M7 4v16l13-8z"></path>
+			</svg>
+			Spiel starten
+		</button>
 	</div>
 
 	<div class="mt-4 flex items-center justify-between gap-4">
@@ -65,59 +72,80 @@ const items = [
 				id="cv-btn-left"
 				type="button"
 				aria-label="Nach links laufen"
-				class="h-11 w-11 select-none rounded-md border border-slate-300 text-lg font-semibold text-slate-700 transition-colors hover:border-indigo-500 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-indigo-400 dark:hover:text-indigo-400"
-				>◀</button
+				class="btn btn-outline w-11 px-0"
 			>
+				<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+					<path d="M17 4v16L4 12z"></path>
+				</svg>
+			</button>
 			<button
 				id="cv-btn-right"
 				type="button"
 				aria-label="Nach rechts laufen"
-				class="h-11 w-11 select-none rounded-md border border-slate-300 text-lg font-semibold text-slate-700 transition-colors hover:border-indigo-500 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-indigo-400 dark:hover:text-indigo-400"
-				>▶</button
+				class="btn btn-outline w-11 px-0"
 			>
+				<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+					<path d="M7 4v16l13-8z"></path>
+				</svg>
+			</button>
 		</div>
 		<button
 			id="cv-btn-jump"
 			type="button"
 			aria-label="Springen"
-			class="h-11 rounded-md bg-indigo-600 px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+			class="btn btn-primary px-6"
 			>Springen</button
 		>
 	</div>
 
 	<div
 		id="cv-game-panel"
-		class="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-5 dark:border-indigo-500/30 dark:bg-indigo-500/10"
+		aria-live="polite"
+		class="mt-6 border border-line border-l-4 border-l-accent bg-card p-5"
 	>
-		<p class="text-sm text-slate-600 dark:text-slate-400">
+		<p class="text-sm text-muted">
 			Lauf los, um die erste Station zu erreichen …
 		</p>
 	</div>
 
-	<details class="mt-6 group">
+	<p id="cv-game-alt" class="sr-only">
+		Alle Inhalte des Spiels stehen darunter auch als Text bereit.
+	</p>
+	<details class="group mt-6">
 		<summary
-			class="cursor-pointer text-sm font-medium text-indigo-600 marker:content-none dark:text-indigo-400"
+			class="inline-flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold tracking-wide text-accent uppercase underline-offset-4 marker:content-none hover:underline [&::-webkit-details-marker]:hidden"
 		>
+			<svg
+				class="icon transition-transform duration-150 group-open:rotate-45"
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="square"
+			>
+				<path d="M12 5v14M5 12h14"></path>
+			</svg>
 			Lebenslauf als Text anzeigen
 		</summary>
-		<div class="mt-6 space-y-8">
+		<div class="mt-6 divide-y divide-line border-y border-line">
 			{
 				items.map((item) => (
-					<div>
-						<p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+					<div class="grid gap-2 py-6 md:grid-cols-[12rem_1fr] md:gap-8">
+						<p class="text-sm font-medium text-accent tabular-nums">
 							{item.date}
 						</p>
-						<h3 class="mt-1 font-semibold text-slate-900 dark:text-slate-100">
-							{item.title}
-						</h3>
-						<p class="text-sm text-slate-600 dark:text-slate-400">
-							{item.place}
-						</p>
-						{item.points.length > 0 && (
-							<ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-400">
-								{item.points.map((point) => <li>{point}</li>)}
-							</ul>
-						)}
+						<div>
+							<h3 class="font-display text-lg leading-snug font-bold">
+								{item.title}
+							</h3>
+							<p class="text-sm text-muted">{item.place}</p>
+							{item.points.length > 0 && (
+								<ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-muted">
+									{item.points.map((point) => <li>{point}</li>)}
+								</ul>
+							)}
+						</div>
 					</div>
 				))
 			}
@@ -239,6 +267,30 @@ const items = [
 			return document.documentElement.classList.contains("dark");
 		}
 
+		// Canvas colours come from the CSS tokens so the game follows the theme.
+		const fontFamily = getComputedStyle(document.body).fontFamily;
+		let tokens = readTokens();
+		function readTokens() {
+			const styles = getComputedStyle(document.documentElement);
+			const token = (name: string) => styles.getPropertyValue(name).trim();
+			return {
+				bg: token("--bg"),
+				fg: token("--fg"),
+				card: token("--card"),
+				accent: token("--accent"),
+				bonus: token("--bonus"),
+				onBonus: token("--on-bonus"),
+				done: token("--done"),
+			};
+		}
+		new MutationObserver(() => {
+			tokens = readTokens();
+			if (!started) draw();
+		}).observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+
 		function resizeCanvas() {
 			if (!canvas) return;
 			const rect = canvas.getBoundingClientRect();
@@ -273,19 +325,19 @@ const items = [
 					? `<ul class="mt-3 space-y-1 pl-5 text-sm">${cp.item.points
 							.map((p, idx) =>
 								cp.collected.has(idx)
-									? `<li class="list-disc text-slate-600 dark:text-slate-400">${p}</li>`
-									: `<li class="list-none text-slate-400 dark:text-slate-600">░░░░░░░░░░░░░░░░░░</li>`,
+									? `<li class="list-disc text-muted">${p}</li>`
+									: `<li class="list-none text-line">░░░░░░░░░░░░░░░░░░</li>`,
 							)
 							.join("")}</ul>${
 							collectedCount < total
-								? `<p class="mt-2 text-xs text-slate-500 dark:text-slate-500">🧱 Noch ${total - collectedCount} Block${total - collectedCount === 1 ? "" : "s"} über dir – von unten anspringen!</p>`
-								: `<p class="mt-2 text-xs text-emerald-600 dark:text-emerald-400">✓ Alle Punkte entdeckt!</p>`
+								? `<p class="mt-2 text-xs text-muted">Noch ${total - collectedCount} Block${total - collectedCount === 1 ? "" : "s"} über dir – von unten anspringen!</p>`
+								: `<p class="mt-2 text-xs font-medium text-done">Alle Punkte entdeckt!</p>`
 						}`
 					: "";
 			renderPanel(`
-				<p class="text-sm font-medium text-indigo-600 dark:text-indigo-400">${cp.item.date}</p>
-				<h3 class="mt-1 font-semibold text-slate-900 dark:text-slate-100">${cp.item.title}</h3>
-				<p class="text-sm text-slate-600 dark:text-slate-400">${cp.item.place}</p>
+				<p class="text-sm font-medium text-accent tabular-nums">${cp.item.date}</p>
+				<h3 class="mt-1 font-display text-lg leading-snug font-bold">${cp.item.title}</h3>
+				<p class="text-sm text-muted">${cp.item.place}</p>
 				${pointsHtml}
 			`);
 		}
@@ -300,9 +352,9 @@ const items = [
 
 		function finishHtml() {
 			return `
-				<p class="font-semibold text-slate-900 dark:text-slate-100">Geschafft! 🏁</p>
-				<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Du hast ${totalCollected} von ${totalPoints} Lebenslauf-Punkten entdeckt. Lust, mehr zu erfahren?</p>
-				<a href="#kontakt" class="mt-3 inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500">Kontakt aufnehmen</a>
+				<p class="font-display text-lg font-bold">Geschafft!</p>
+				<p class="mt-1 text-sm text-muted">Du hast ${totalCollected} von ${totalPoints} Lebenslauf-Punkten entdeckt. Lust, mehr zu erfahren?</p>
+				<a href="#kontakt" class="btn btn-primary mt-3">Kontakt aufnehmen</a>
 			`;
 		}
 
@@ -394,10 +446,11 @@ const items = [
 
 		function draw() {
 			const dark = isDark();
+			const accent = tokens.accent;
 			ctx.clearRect(0, 0, viewWidth, HEIGHT);
 
-			const skyTop = dark ? "#0f172a" : "#eef2ff";
-			const skyBottom = dark ? "#020617" : "#ffffff";
+			const skyTop = dark ? tokens.card : "#f4f4f5";
+			const skyBottom = tokens.bg;
 			const grad = ctx.createLinearGradient(0, 0, 0, HEIGHT);
 			grad.addColorStop(0, skyTop);
 			grad.addColorStop(1, skyBottom);
@@ -409,7 +462,7 @@ const items = [
 				Math.min(player.x - viewWidth / 2, levelWidth - viewWidth),
 			);
 
-			ctx.fillStyle = dark ? "rgba(148,163,184,0.15)" : "rgba(255,255,255,0.8)";
+			ctx.fillStyle = dark ? "rgba(161,161,170,0.15)" : "#ffffff";
 			for (const c of clouds) {
 				const cx = c.x - camX * 0.15;
 				if (cx < -40 || cx > viewWidth + 40) continue;
@@ -420,7 +473,7 @@ const items = [
 				ctx.fill();
 			}
 
-			ctx.fillStyle = dark ? "#111827" : "#e0e7ff";
+			ctx.fillStyle = dark ? "#1f1f23" : "#e4e4e7";
 			for (const h of hills) {
 				const hx = h.x - camX * 0.4;
 				if (hx < -h.r || hx > viewWidth + h.r) continue;
@@ -432,20 +485,20 @@ const items = [
 				ctx.fill();
 			}
 
-			ctx.fillStyle = dark ? "#1e293b" : "#e2e8f0";
+			ctx.fillStyle = dark ? "#27272a" : "#d4d4d8";
 			for (const s of segments) {
 				ctx.fillRect(s.x - camX, GROUND_Y, s.w, HEIGHT - GROUND_Y);
-				ctx.fillStyle = "#4f46e5";
+				ctx.fillStyle = accent;
 				ctx.fillRect(s.x - camX, GROUND_Y, s.w, 3);
-				ctx.fillStyle = dark ? "#1e293b" : "#e2e8f0";
+				ctx.fillStyle = dark ? "#27272a" : "#d4d4d8";
 			}
 
 			for (const st of steps) {
 				const stx = st.x - camX;
 				if (stx < -60 || stx > viewWidth + 60) continue;
-				ctx.fillStyle = dark ? "#334155" : "#cbd5e1";
+				ctx.fillStyle = dark ? "#3f3f46" : "#a1a1aa";
 				ctx.fillRect(stx, st.y, st.w, STEP_THICKNESS);
-				ctx.fillStyle = "#818cf8";
+				ctx.fillStyle = accent;
 				ctx.fillRect(stx, st.y, st.w, 3);
 			}
 
@@ -453,16 +506,16 @@ const items = [
 				const bx = b.x - camX;
 				if (bx < -40 || bx > viewWidth + 40) continue;
 				const by = b.y - (b.bounce > 0 ? Math.sin(b.bounce * Math.PI) * 8 : 0);
-				ctx.fillStyle = b.hit ? (dark ? "#57534e" : "#a8a29e") : "#f59e0b";
+				ctx.fillStyle = b.hit ? (dark ? "#57534e" : "#a8a29e") : tokens.bonus;
 				ctx.beginPath();
-				ctx.roundRect(bx, by, b.w, b.h, 4);
+				ctx.rect(bx, by, b.w, b.h);
 				ctx.fill();
 				ctx.strokeStyle = dark ? "#292524" : "#78716c";
 				ctx.lineWidth = 2;
 				ctx.stroke();
 				if (!b.hit) {
-					ctx.fillStyle = "#78350f";
-					ctx.font = "bold 14px sans-serif";
+					ctx.fillStyle = tokens.onBonus;
+					ctx.font = `bold 14px ${fontFamily}`;
 					ctx.textAlign = "center";
 					ctx.fillText("?", bx + b.w / 2, by + b.h / 2 + 5);
 				}
@@ -470,63 +523,63 @@ const items = [
 
 			for (const cp of checkpoints) {
 				const px = cp.x - camX;
-				ctx.strokeStyle = dark ? "#475569" : "#94a3b8";
+				ctx.strokeStyle = dark ? "#71717a" : "#a1a1aa";
 				ctx.lineWidth = 3;
 				ctx.beginPath();
 				ctx.moveTo(px, GROUND_Y);
 				ctx.lineTo(px, GROUND_Y - 70);
 				ctx.stroke();
-				ctx.fillStyle = cp.visited ? "#10b981" : "#4f46e5";
+				ctx.fillStyle = cp.visited ? tokens.done : accent;
 				ctx.beginPath();
 				ctx.moveTo(px, GROUND_Y - 70);
 				ctx.lineTo(px + 26, GROUND_Y - 58);
 				ctx.lineTo(px, GROUND_Y - 46);
 				ctx.closePath();
 				ctx.fill();
-				ctx.fillStyle = dark ? "#cbd5e1" : "#334155";
-				ctx.font = "11px sans-serif";
+				ctx.fillStyle = tokens.fg;
+				ctx.font = `500 11px ${fontFamily}`;
 				ctx.textAlign = "center";
 				ctx.fillText(cp.item.date, px, GROUND_Y - 80);
 			}
 
 			const fx = finish.x - camX;
-			ctx.strokeStyle = dark ? "#475569" : "#94a3b8";
+			ctx.strokeStyle = dark ? "#71717a" : "#a1a1aa";
 			ctx.lineWidth = 3;
 			ctx.beginPath();
 			ctx.moveTo(fx, GROUND_Y);
 			ctx.lineTo(fx, GROUND_Y - 90);
 			ctx.stroke();
-			ctx.fillStyle = finish.reached ? "#10b981" : "#fbbf24";
+			ctx.fillStyle = finish.reached ? tokens.done : tokens.bonus;
 			ctx.fillRect(fx, GROUND_Y - 90, 28, 20);
-			ctx.fillStyle = dark ? "#cbd5e1" : "#334155";
-			ctx.font = "11px sans-serif";
+			ctx.fillStyle = tokens.fg;
+			ctx.font = `500 11px ${fontFamily}`;
 			ctx.textAlign = "center";
 			ctx.fillText("Kontakt", fx + 14, GROUND_Y - 98);
 
 			const px = player.x - camX;
 			const legSwing = Math.sin(walkT) * 6;
-			ctx.fillStyle = "#3730a3";
+			ctx.fillStyle = tokens.fg;
 			ctx.fillRect(px + 4, player.y + PLAYER_H - 6, 6, 6 + legSwing);
 			ctx.fillRect(px + PLAYER_W - 10, player.y + PLAYER_H - 6, 6, 6 - legSwing);
 
-			ctx.fillStyle = "#4f46e5";
+			ctx.fillStyle = accent;
 			ctx.beginPath();
-			ctx.roundRect(px, player.y, PLAYER_W, PLAYER_H, 6);
+			ctx.rect(px, player.y, PLAYER_W, PLAYER_H);
 			ctx.fill();
 			ctx.fillStyle = "#ffffff";
 			const eyeX = player.facing === 1 ? px + PLAYER_W - 9 : px + 5;
 			ctx.beginPath();
 			ctx.arc(eyeX, player.y + 10, 3.5, 0, Math.PI * 2);
 			ctx.fill();
-			ctx.fillStyle = "#1e1b4b";
+			ctx.fillStyle = "#172554";
 			ctx.beginPath();
 			ctx.arc(eyeX + (player.facing === 1 ? 1 : -1), player.y + 10, 1.6, 0, Math.PI * 2);
 			ctx.fill();
 
 			for (const p of particles) {
 				ctx.globalAlpha = Math.max(0, p.life);
-				ctx.fillStyle = "#f59e0b";
-				ctx.font = "bold 12px sans-serif";
+				ctx.fillStyle = tokens.bonus;
+				ctx.font = `bold 12px ${fontFamily}`;
 				ctx.textAlign = "center";
 				ctx.fillText(p.text, p.x - camX, p.y - (1 - p.life) * 24);
 				ctx.globalAlpha = 1;
@@ -534,8 +587,8 @@ const items = [
 
 			const visitedCount = checkpoints.filter((c) => c.visited).length;
 			ctx.textAlign = "left";
-			ctx.font = "12px sans-serif";
-			ctx.fillStyle = dark ? "#cbd5e1" : "#334155";
+			ctx.font = `500 12px ${fontFamily}`;
+			ctx.fillStyle = tokens.fg;
 			ctx.fillText(`Stationen: ${visitedCount}/${checkpoints.length}`, 12, 20);
 			ctx.fillText(`Punkte: ${totalCollected}/${totalPoints}`, 12, 36);
 		}

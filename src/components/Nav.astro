@@ -12,23 +12,23 @@ const links = [
 
 <header
 	id="site-header"
-	class="sticky top-0 z-50 border-b border-transparent bg-white/80 backdrop-blur-md transition-colors dark:bg-slate-950/80"
+	class="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-md"
 >
-	<div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3">
+	<div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-2">
 		<a
 			href="#hero"
-			class="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100"
+			class="flex min-h-11 items-center font-display text-base font-extrabold tracking-tight uppercase"
 		>
 			Paul Scholl
 		</a>
-		<nav class="hidden items-center gap-1 md:flex">
+		<nav aria-label="Hauptnavigation" class="hidden items-center gap-1 md:flex">
 			{
 				links.map((link) => (
 					<a
 						href={link.href}
 						data-nav-link
 						data-target={link.href.slice(1)}
-						class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+						class="flex min-h-11 items-center border-b-2 border-transparent px-3 text-sm font-medium tracking-wide text-muted uppercase transition-colors duration-150 hover:text-fg data-active:border-accent data-active:text-fg"
 					>
 						{link.label}
 					</a>
@@ -37,8 +37,11 @@ const links = [
 		</nav>
 		<ThemeToggle />
 	</div>
+	<!-- Fading right edge signals that the strip scrolls horizontally -->
 	<nav
-		class="flex gap-1 overflow-x-auto px-6 pb-3 whitespace-nowrap [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
+		aria-label="Hauptnavigation"
+		data-nav-strip
+		class="flex gap-1 overflow-x-auto border-t border-line px-3 whitespace-nowrap [mask-image:linear-gradient(to_right,#000_calc(100%-2.5rem),transparent)] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
 	>
 		{
 			links.map((link) => (
@@ -46,7 +49,7 @@ const links = [
 					href={link.href}
 					data-nav-link
 					data-target={link.href.slice(1)}
-					class="shrink-0 rounded-md px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+					class="flex min-h-11 shrink-0 items-center border-b-2 border-transparent px-3 text-sm last:mr-8 font-medium tracking-wide text-muted uppercase transition-colors duration-150 hover:text-fg data-active:border-accent data-active:text-fg"
 				>
 					{link.label}
 				</a>
@@ -60,37 +63,25 @@ const links = [
 		const header = document.getElementById("site-header");
 		if (!header) return;
 
-		function onScroll() {
-			if (window.scrollY > 8) {
-				header.classList.add(
-					"border-slate-200/70",
-					"dark:border-slate-800/70",
-				);
-				header.classList.remove("border-transparent");
-			} else {
-				header.classList.add("border-transparent");
-				header.classList.remove(
-					"border-slate-200/70",
-					"dark:border-slate-800/70",
-				);
-			}
-		}
-		onScroll();
-		window.addEventListener("scroll", onScroll, { passive: true });
-
 		const navLinks = Array.from(document.querySelectorAll("[data-nav-link]"));
 		const sections = navLinks
 			.map((link) => document.getElementById(link.dataset.target || ""))
 			.filter(Boolean);
 
+		const strip = header.querySelector("[data-nav-strip]");
+
 		function setActive(id) {
 			navLinks.forEach((link) => {
 				const isActive = link.dataset.target === id;
-				link.classList.toggle("text-indigo-600", isActive);
-				link.classList.toggle("dark:text-indigo-400", isActive);
-				link.classList.toggle("font-semibold", isActive);
-				link.classList.toggle("text-slate-600", !isActive);
-				link.classList.toggle("dark:text-slate-400", !isActive);
+				link.toggleAttribute("data-active", isActive);
+				if (isActive) link.setAttribute("aria-current", "location");
+				else link.removeAttribute("aria-current");
+				// Keep the active link visible inside the mobile scroll strip
+				if (isActive && strip && strip.contains(link)) {
+					strip.scrollTo({
+						left: link.offsetLeft - strip.clientWidth / 2 + link.offsetWidth / 2,
+					});
+				}
 			});
 		}
 

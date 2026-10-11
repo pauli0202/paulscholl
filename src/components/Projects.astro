@@ -29,37 +29,54 @@ const projects = [
 ];
 ---
 
-<section id="projekte" class="mx-auto max-w-5xl px-6 py-16 md:py-24">
-	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Projekte</h2>
-	<div class="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+<section id="projekte" class="section">
+	<h2 class="section-title">Projekte</h2>
+	<ul class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
 		{
 			projects.map((project) => (
-				<a
-					href={project.href}
-					target="_blank"
-					rel="noopener noreferrer"
-					class="group block overflow-hidden rounded-lg border border-slate-200 transition-colors hover:border-indigo-500 dark:border-slate-800 dark:hover:border-indigo-400"
-				>
-					<Image
-						src={project.image}
-						alt={project.title}
-						width={640}
-						height={400}
-						class="h-40 w-full object-cover"
-					/>
-					<div class="p-5">
-						<h3 class="font-semibold text-slate-900 group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-400">
-							{project.title}
-						</h3>
-						<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-							{project.description}
-						</p>
-						<p class="mt-3 text-sm font-medium text-indigo-600 dark:text-indigo-400">
-							{project.role}
-						</p>
-					</div>
-				</a>
+				<li class="flex">
+					<a
+						href={project.href}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="group flex w-full flex-col border-2 border-fg bg-card transition-[translate,box-shadow] duration-150 hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--accent)] focus-visible:-translate-x-1 focus-visible:-translate-y-1 focus-visible:shadow-[6px_6px_0_0_var(--accent)]"
+					>
+						<Image
+							src={project.image}
+							alt=""
+							width={640}
+							height={400}
+							class="aspect-[16/10] w-full border-b-2 border-fg object-cover"
+						/>
+						<div class="flex flex-1 flex-col p-5">
+							<h3 class="font-display text-xl leading-snug font-bold">
+								{project.title}
+							</h3>
+							<p class="mt-1 text-sm text-muted">{project.description}</p>
+							<p class="mt-3 text-sm font-medium text-accent">
+								{project.role}
+							</p>
+							<p class="label mt-auto flex items-center justify-between gap-3 border-t border-line pt-4 text-fg">
+								<span class="truncate tracking-normal normal-case">
+									{new URL(project.href).hostname.replace(/^www\./, "")}
+								</span>
+								<svg
+									class="icon transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+									aria-hidden="true"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="square"
+								>
+									<path d="M7 17 17 7M8 7h9v9" />
+								</svg>
+								<span class="sr-only">(öffnet in neuem Tab)</span>
+							</p>
+						</div>
+					</a>
+				</li>
 			))
 		}
-	</div>
+	</ul>
 </section>

@@ -2,28 +2,150 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme inline {
+  --font-sans: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-bonus-text: var(--bonus-text);
+  --color-done: var(--done);
+}
+
+/* Monochrome zinc + one blue accent. All pairs meet 4.5:1 in both themes. */
+:root {
+  --bg: #fafafa;
+  --fg: #09090b;
+  --card: #ffffff;
+  --muted: #52525b;
+  --line: #d4d4d8;
+  --accent: #2563eb;
+  --on-accent: #ffffff;
+  /* Reward colour of the CV game (?-blocks, +1). Decorative fills only. */
+  --bonus: #f59e0b;
+  --on-bonus: #451a03;
+  --bonus-text: #b45309;
+  --done: #047857;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #09090b;
+  --fg: #fafafa;
+  --card: #18181b;
+  --muted: #a1a1aa;
+  --line: #3f3f46;
+  --accent: #60a5fa;
+  --on-accent: #09090b;
+  --bonus: #f59e0b;
+  --on-bonus: #451a03;
+  --bonus-text: #fbbf24;
+  --done: #34d399;
+  color-scheme: dark;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
+body {
+  line-height: 1.6;
+  counter-reset: section;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
 /* Offset anchor scrolling so the sticky header never covers a section's heading.
    Mobile header is two rows (nav + scroll strip) and taller than the desktop one. */
-#hero,
-#ueber-mich,
-#skills,
-#projekte,
-#erfahrung,
-#kontakt {
+section[id] {
   scroll-margin-top: 7rem;
 }
 
 @media (min-width: 768px) {
-  #hero,
-  #ueber-mich,
-  #skills,
-  #projekte,
-  #erfahrung,
-  #kontakt {
+  section[id] {
     scroll-margin-top: 5rem;
+  }
+}
+
+@layer components {
+  .section {
+    @apply mx-auto max-w-6xl px-6 pt-12 pb-17 md:pt-16 md:pb-21;
+  }
+
+  /* Numbered section heading sitting on a full-width rule. Line-height stays
+     above 1.06 so uppercase umlauts never touch the rule or a line above. */
+  .section-title {
+    @apply flex items-baseline gap-4 border-t-2 border-fg pt-10 font-display text-3xl leading-[1.1] font-extrabold tracking-tight text-balance uppercase sm:text-5xl;
+  }
+
+  .section-title::before {
+    counter-increment: section;
+    content: counter(section, decimal-leading-zero);
+    content: counter(section, decimal-leading-zero) / "";
+    @apply shrink-0 font-sans text-sm font-medium tracking-widest text-accent tabular-nums;
+  }
+
+  .btn {
+    @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 border-2 border-fg px-5 text-sm font-semibold tracking-wide uppercase transition-colors duration-150 select-none active:translate-x-px active:translate-y-px;
+  }
+
+  .btn-primary {
+    @apply bg-fg text-bg hover:border-accent hover:bg-accent hover:text-on-accent;
+  }
+
+  .btn-outline {
+    @apply text-fg hover:bg-fg hover:text-bg;
+  }
+
+  .tag {
+    @apply inline-flex items-center border border-line px-2.5 py-1 text-xs font-medium text-fg;
+  }
+
+  .eyebrow {
+    @apply text-sm font-medium tracking-widest text-accent uppercase;
+  }
+
+  /* Small uppercase label for data rows (facts, contact, card meta). */
+  .label {
+    @apply text-xs font-medium tracking-widest text-muted uppercase;
+  }
+
+  /* Hard offset shadow, the one depth cue of the system. */
+  .shadow-hard {
+    box-shadow: 6px 6px 0 0 var(--accent);
+  }
+
+  /* First tab stop: jumps past the sticky header straight to the content. */
+  .skip-link {
+    @apply fixed top-2 left-2 z-100 -translate-y-20 border-2 border-fg bg-bg px-4 py-3 text-sm font-semibold tracking-wide uppercase focus-visible:translate-y-0;
+  }
+
+  .icon {
+    @apply h-4 w-4 shrink-0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
   }
 }

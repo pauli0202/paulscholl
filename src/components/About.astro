@@ -1,23 +1,45 @@
-<section id="ueber-mich" class="mx-auto max-w-5xl px-6 py-16 text-center md:py-24">
-	<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Über mich</h2>
-	<div
-		class="mx-auto mt-6 max-w-3xl space-y-4 text-slate-600 dark:text-slate-400"
-	>
-		<p>
-			Ich habe meine Ausbildung zum Fachinformatiker für
-			Anwendungsentwicklung am TGBBZ Dillingen absolviert (2022–2025) und
-			arbeite seit Januar 2025 als WordPress Developer bei der
-			Pocket-Rocket GmbH.
-		</p>
-		<p>
-			Dort betreue ich Kundenprojekte eigenverantwortlich, entwickle
-			eigene WordPress-Plugins und PHP-Module und setze das Frontend mit
-			Astro, TypeScript, Tailwind sowie Oxygen, Divi und Elementor um.
-		</p>
-		<p>
-			Neben meiner Arbeit als Webentwickler interessiere ich mich stark
-			für KI- und Agentic-Tooling und setze dies auch aktiv ein, um meine
-			eigenen Workflows zu beschleunigen.
-		</p>
+---
+const facts = [
+	{ label: "Standort", value: "Saarland" },
+	{ label: "Aktuell", value: "WordPress Developer, Pocket-Rocket GmbH" },
+	{
+		label: "Ausbildung",
+		value: "Fachinformatiker für Anwendungsentwicklung, TGBBZ Dillingen",
+	},
+	{ label: "Verfügbar", value: "ab Oktober 2026" },
+];
+---
+
+<section id="ueber-mich" class="section">
+	<h2 class="section-title">Über mich</h2>
+	<div class="mt-10 grid gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16">
+		<dl class="divide-y divide-line self-start border-y border-line">
+			{
+				facts.map((fact) => (
+					<div class="grid grid-cols-[7rem_1fr] gap-4 py-3">
+						<dt class="label pt-0.5">{fact.label}</dt>
+						<dd class="text-sm font-medium">{fact.value}</dd>
+					</div>
+				))
+			}
+		</dl>
+		<div class="max-w-2xl space-y-5 text-lg text-muted">
+			<p>
+				Ich habe meine Ausbildung zum Fachinformatiker für
+				Anwendungsentwicklung am TGBBZ Dillingen absolviert (2022–2025) und
+				arbeite seit Januar 2025 als WordPress Developer bei der
+				Pocket-Rocket GmbH.
+			</p>
+			<p>
+				Dort betreue ich Kundenprojekte eigenverantwortlich, entwickle
+				eigene WordPress-Plugins und PHP-Module und setze das Frontend mit
+				Astro, TypeScript, Tailwind sowie Oxygen, Divi und Elementor um.
+			</p>
+			<p>
+				Neben meiner Arbeit als Webentwickler interessiere ich mich stark
+				für KI- und Agentic-Tooling und setze dies auch aktiv ein, um meine
+				eigenen Workflows zu beschleunigen.
+			</p>
+		</div>
 	</div>
 </section>

@@ -5,52 +5,62 @@ import profile from "../assets/profile.jpg";
 
 <section
 	id="hero"
-	class="flex flex-col items-center gap-6 px-6 pt-10 pb-12 text-center sm:pt-16 md:pb-16 md:pt-20"
+	class="mx-auto max-w-6xl px-6 pt-10 pb-12 sm:pt-16 md:pt-20 md:pb-16"
 >
-	<Image
-		src={profile}
-		alt="Portrait von Paul Scholl"
-		width={128}
-		height={128}
-		loading="eager"
-		fetchpriority="high"
-		class="h-32 w-32 rounded-full object-cover ring-4 ring-indigo-500/20"
-	/>
-	<div class="space-y-3">
-		<h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Paul Scholl</h1>
-		<p class="text-lg font-medium text-indigo-600 dark:text-indigo-400">
-			Webentwickler & AI Engineer
-		</p>
-		<p class="mx-auto max-w-xl text-slate-600 dark:text-slate-400">
-			Webentwickler aus dem Saarland. PHP, WooCommerce und
-			datenbankgestützte Webanwendungen.
-		</p>
-		<p
-			class="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300"
-		>
-			Verfügbar ab Oktober 2026
-		</p>
+	<div class="grid gap-8 md:grid-cols-[1fr_auto] md:items-start md:gap-12">
+		<Image
+			src={profile}
+			alt="Portrait von Paul Scholl"
+			width={192}
+			height={192}
+			densities={[1, 1.5]}
+			loading="eager"
+			fetchpriority="high"
+			class="shadow-hard h-36 w-36 border-2 border-fg object-cover md:order-last md:mt-2 md:h-48 md:w-48"
+		/>
+		<div>
+			<h1
+				class="font-display text-[clamp(3.5rem,17vw,10rem)] leading-[0.85] font-black tracking-tighter uppercase"
+			>
+				<span class="block">Paul</span>
+				<span class="block">Scholl</span>
+			</h1>
+			<p class="eyebrow mt-6 sm:text-base">Webentwickler & AI Engineer</p>
+			<p class="mt-3 max-w-xl text-lg text-muted">
+				Webentwickler aus dem Saarland. PHP, WooCommerce und
+				datenbankgestützte Webanwendungen.
+			</p>
+		</div>
 	</div>
-	<div class="flex flex-wrap items-center justify-center gap-4">
-		<a
-			href="#kontakt"
-			class="rounded-md bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
-		>
-			Kontakt aufnehmen
-		</a>
-		<a
-			href="#projekte"
-			class="rounded-md border border-slate-500 px-5 py-2.5 text-sm font-semibold text-slate-800 transition-colors hover:border-indigo-500 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-indigo-400 dark:hover:text-indigo-400"
-		>
-			Projekte ansehen
-		</a>
+
+	<p
+		class="mt-8 inline-flex items-center gap-2.5 border border-line px-3 py-1.5 text-sm font-medium"
+	>
+		<span class="h-2 w-2 bg-accent" aria-hidden="true"></span>
+		Verfügbar ab Oktober 2026
+	</p>
+	<div class="mt-6 flex flex-wrap gap-3">
+		<a href="#kontakt" class="btn btn-primary">Kontakt aufnehmen</a>
+		<a href="#projekte" class="btn btn-outline">Projekte ansehen</a>
 		<a
 			href="https://github.com/pauli0202/paulscholl"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="rounded-md border border-slate-500 px-5 py-2.5 text-sm font-semibold text-slate-800 transition-colors hover:border-indigo-500 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-indigo-400 dark:hover:text-indigo-400"
+			class="btn btn-outline"
 		>
 			Quellcode auf GitHub
+			<svg
+				class="icon"
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="square"
+			>
+				<path d="M7 17 17 7M8 7h9v9"></path>
+			</svg>
+			<span class="sr-only">(öffnet in neuem Tab)</span>
 		</a>
 	</div>
 </section>
